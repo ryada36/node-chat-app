@@ -1,25 +1,70 @@
 var socket=io();
+
+function scrollToBottom () {
+  // Selectors
+  var messages = jQuery('#chatbox');
+  var newMessage = messages.children('li:last-child')
+  // Heights
+  var clientHeight = messages.prop('clientHeight');
+  var scrollTop = messages.prop('scrollTop');
+  var scrollHeight = messages.prop('scrollHeight');
+  var newMessageHeight = newMessage.innerHeight();
+  var lastMessageHeight = newMessage.prev().innerHeight();
+
+  if (clientHeight + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight) {
+    messages.scrollTop(scrollHeight);
+  }
+}
+
+
 socket.on('connect',function(){
-    console.log('connecting  to server');
+    var params = jQuery.deparam(window.location.search);
+    socket.emit('join', params, function (err) {
+        if (err) {
+        alert(err);
+        window.location.href = '/';
+        } else {
+        console.log('No error');
+        }
+    });
 });
 socket.on('disconnect', () => {
     console.log('Disconnected from server');
 });
 
-socket.on('new-message',function(data){
-    var htmlStr='<li>'+ data.from+ ' : '+data.text+'</li>'
-    $('#chatbox').append(htmlStr);
+socket.on('updateUserList', function (users) {
+  var ol = $('<ol></ol>');
+
+  users.forEach(function (user) {
+    ol.append($('<li></li>').text(user));
+  });
+
+  $('#users').html(ol);
+});
+
+socket.on('new-message',function(message){
+    var formattedTime = moment(message.createdAt).format('h:mm a');
+    var template = $('#message-template').html();
+    var html = Mustache.render(template, {
+        text: message.text,
+        from: message.from,
+        createdAt: formattedTime
+    });
+
+    jQuery('#chatbox').append(html);
+    scrollToBottom();
 });
 
 socket.on('new-location',function(data){
-    var htmlStr=$('<li></li>')
-    var link=$('<a></a>')
-    link.attr('href',data.url);
-    link.attr('target','_blank');
-    link.text('Current Location');
-    htmlStr.text('User : ')
-    htmlStr.append(link);
-    $('#chatbox').append(htmlStr);
+    var formattedTime=moment(data.createdAt).format('h :mm a');
+    var template=$('#location-message-template').html();
+    var html = Mustache.render(template, {
+        from: data.from,
+        url: data.url,
+        createdAt: formattedTime
+    });
+    $('#chatbox').append(html);
+    scrollToBottom();
 })
 
 $('#send').on('click',function(event){
@@ -28,7 +73,7 @@ $('#send').on('click',function(event){
     if(!message.val())
         return alert('please enter some message');
     socket.emit('send-message',{
-        from:'User',
+        from:message.from,
         text:message.val()
     },function(){
         message.val('');
@@ -45,7 +90,6 @@ $('#geolocation').on('click',function(event){
         var lat=data.coords.latitude;
         var lng=data.coords.longitude;
         socket.emit('send-location',{
-            from:'user',
             lat,
             lng
         });

@@ -1,39 +1,32 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Friendly Chat App</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="/css/main.css">
-    </head>
-    <body class="chat">
-        <!--[if lt IE 7]>
-            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
-        <![endif]-->
-        
-        <div class="chat__sidebar">
-            <h3>People</h3>
-            <div id="users"></div>
-        </div>
-        <!-- chat box body -->
-        <div class="chat__main">
-            <ol id="chatbox" class="chat__messages"></ol>
-            <div class="chat__footer">
-                <form id="message_form">
-                    <input type="text" name="message" placeholder="message" autofocus autocomplete="off" id="message"/>
-                    <button id="send" type="submit">send</button>
-                </form>
-                <button id="geolocation">Send Location</button>
-            </div>
-        </div>
+<html>
 
-        <script src="/js/lib/socket.io.js"></script>
-        <script src="/js/lib/jquery-2.1.4.min.js"></script>
-        <script src="/js/main.js"></script>
-    </body>
+<head>
+  <meta charset="utf-8">
+  <title>Join | ChatApp</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+
+<body class="centered-form">
+  <div class="centered-form__form">
+    <form action="/chat.html">
+      <div class="form-field">
+        <h3>Join a Chat<h3>
+      </div>
+      <div class="form-field">
+        <label>Display name</label>
+        <input type="text" name="name" autofocus/>
+      </div>
+      <div class="form-field">
+        <label>Room name</label>
+        <input type="text" name="room"/>
+      </div>
+      <div class="form-field">
+        <button>Join</button>
+      </div>
+    </form>
+  </div>
+</body>
+
 </html>

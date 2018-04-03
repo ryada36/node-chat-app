@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Friendly Chat App</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/css/main.css">
+    </head>
+    <body class="chat">
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+        
+        <div class="chat__sidebar">
+            <h3>People</h3>
+            <div id="users"></div>
+        </div>
+        <!-- chat box body -->
+        <div class="chat__main">
+            <ol id="chatbox" class="chat__messages"></ol>
+            <div class="chat__footer">
+                <form id="message_form">
+                    <input type="text" name="message" placeholder="message" autofocus autocomplete="off" id="message"/>
+                    <button id="send" type="submit">send</button>
+                </form>
+                <button id="geolocation">Send Location</button>
+            </div>
+        </div>
+        <!-- template for normal message -->
+        <script id="message-template" type="text/template">
+            <li class="message">
+                <div class="message__title">
+                    <h4>{{from}}</h4>
+                    <span>{{createdAt}}</span>
+                </div>
+                <div class="message-body">
+                    <p>{{text}}</p>
+                </div>
+            </li>
+        </script>
+        <!-- template for location message -->
+        <script id="location-message-template" type="text/template">
+            <li class="message">
+            <div class="message__title">
+                <h4>{{from}}</h4>
+                <span>{{createdAt}}</span>
+            </div>
+            <div class="message__body">
+                <p>
+                <a href="{{url}}" target="_blank">My current location</a>
+                </p>
+            </div>
+            </li>
+        </script>
+
+        <script src="/js/lib/socket.io.js"></script>
+        <script src="/js/lib/jquery-2.1.4.min.js"></script>
+        <script src="/js/lib/moment.js"></script>
+        <script src="/js/lib/mustache.js"></script>
+        <script src="/js/lib/deparam.js"></script>
+        <script src="/js/main.js"></script>
+    </body>
+</html>

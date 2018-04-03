@@ -4,6 +4,8 @@ const path=require('path');
 const socketIO=require('socket.io');
 
 var {generateMessage,generateLocationURL} =require('./utils/utils');
+const {isRealString} = require('./utils/validation');
+const {Users} = require('./utils/users');
 
 var publicPath=path.join(__dirname,'./../public/');
 
@@ -14,6 +16,7 @@ app.use(express.static(publicPath));
 
 var server=http.createServer(app);
 var io=socketIO(server);
+var users = new Users();
 
 server.listen(port,()=>{
     console.log('Server runnint at ',port);
@@ -23,15 +26,44 @@ server.listen(port,()=>{
 
 io.on('connection',(socket)=>{
     console.log('New User Connected');
-    socket.on('disconnect',()=>{
-        console.log('User was disconnected');
-    });
-    socket.on('send-message',(data,callback)=>{
-        io.emit('new-message',generateMessage(data.from,data.text));
+
+    socket.on('join', (params, callback) => {
+        if (!isRealString(params.name) || !isRealString(params.room)) {
+        return callback('Name and room name are required.');
+        }
+
+        socket.join(params.room);
+        users.removeUser(socket.id);
+        users.addUser(socket.id, params.name, params.room);
+
+        io.to(params.room).emit('updateUserList', users.getUserList(params.room));
+        socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
+        socket.broadcast.to(params.room).emit('newMessage', generateMessage('Admin', `${params.name} has joined.`));
         callback();
     });
-    socket.on('send-location',(data)=>{
-        io.emit('new-location',generateLocationURL(data.from,data.lat,data.lng))
+
+    socket.on('disconnect',()=>{
+       var user = users.removeUser(socket.id);
+
+        if (user) {
+            io.to(user.room).emit('updateUserList', users.getUserList(user.room));
+            io.to(user.room).emit('newMessage', generateMessage('Admin', `${user.name} has left.`));
+        }
+    });
+    socket.on('send-message',(message,callback)=>{
+        var user = users.getUser(socket.id);
+
+        if (user && isRealString(message.text)) {
+        io.to(user.room).emit('new-message', generateMessage(user.name, message.text));
+        }
+
+         callback();
+    });
+    socket.on('send-location',(coords)=>{
+       var user = users.getUser(socket.id);
+        if (user) {
+            io.to(user.room).emit('new-location', generateLocationMessage(user.name, coords.lat, coords.lng));  
+        }
     })
 })
 
